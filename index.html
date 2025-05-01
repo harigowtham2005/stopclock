@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch & Clock</title>
+  <style>
+    :root {
+      --bg-light: #f6f8fb;
+      --bg-dark: #1f2937;
+      --container-light: #ffffff;
+      --container-dark: #374151;
+      --text-light: #111827;
+      --text-dark: #f9fafb;
+      --accent: linear-gradient(to right, #6366f1, #3b82f6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .container {
+      background-color: var(--container-light);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      max-width: 440px;
+      width: 95%;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .container {
+      background-color: var(--container-dark);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: inherit;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .time-display {
+      font-size: 3rem;
+      font-weight: 700;
+      color: inherit;
+      margin-bottom: 16px;
+      letter-spacing: 1.2px;
+      background-color: #f1f5f9;
+      padding: 10px 20px;
+      border-radius: 10px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    body.dark-mode .time-display {
+      background-color: #4b5563;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .buttons button, .toggle-theme {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .buttons button:hover, .toggle-theme:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.45);
+    }
+
+    .buttons button:active, .toggle-theme:active {
+      transform: scale(0.98);
+    }
+
+    .buttons button:disabled {
+      background: #d1d5db;
+      color: #6b7280;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .toggle-theme {
+      margin-top: 20px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="section">
+      <h1>Current Time</h1>
+      <div class="time-display" id="clock">--:--:--</div>
+    </div>
+
+    <div class="section">
+      <h1>Stopwatch</h1>
+      <div class="time-display" id="stopwatch">00:00:00</div>
+      <div class="buttons">
+        <button onclick="startStopwatch()" id="startBtn">Start</button>
+        <button onclick="stopStopwatch()" id="stopBtn" disabled>Stop</button>
+        <button onclick="resetStopwatch()" id="resetBtn" disabled>Reset</button>
+      </div>
+    </div>
+
+    <button class="toggle-theme" onclick="toggleTheme()">Toggle Dark Mode</button>
+  </div>
+
+  <script>
+    // Clock functionality
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Stopwatch functionality
+    let stopwatchInterval = null;
+    let elapsed = 0;
+
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      return `${hours}:${minutes}:${seconds}`;
+    }
+
+    function startStopwatch() {
+      if (stopwatchInterval) return;
+      const startTime = Date.now() - elapsed;
+      stopwatchInterval = setInterval(() => {
+        elapsed = Date.now() - startTime;
+        document.getElementById('stopwatch').textContent = formatTime(elapsed);
+      }, 1000);
+
+      document.getElementById('startBtn').disabled = true;
+      document.getElementById('stopBtn').disabled = false;
+      document.getElementById('resetBtn').disabled = false;
+    }
+
+    function stopStopwatch() {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      document.getElementById('startBtn').disabled = false;
+      document.getElementById('stopBtn').disabled = true;
+    }
+
+    function resetStopwatch() {
+      stopStopwatch();
+      elapsed = 0;
+      document.getElementById('stopwatch').textContent = '00:00:00';
+      document.getElementById('resetBtn').disabled = true;
+    }
+
+    // Theme toggle functionality
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>
